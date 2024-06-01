@@ -5,11 +5,20 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
 
+var (
+    outputFileName string
+    targetDir      string
+)
+
+
 func main(){
+	targetDir = ".code/wiki/res/aseprite"
+
 	var rootCmd = &cobra.Command{
 		Use: "rune",
 		Short: "Rune is a CLI application to generate .aseprite files",
@@ -33,18 +42,6 @@ func main(){
 				fmt.Println(err)
 				os.Exit(1)
 			}
-
-			err = initGitRepo()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			err = initialCommit()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
 		},
 	}
 
@@ -57,13 +54,15 @@ func main(){
 }
 
 func generateAsepriteFile(filename string) error {
-    srcFile, err := os.Open("template.aseprite")
+    srcFile, err := os.Open("C:\\rune\\template.aseprite")
     if err != nil {
         return err
     }
     defer srcFile.Close()
 
-    dstFile, err := os.Create(filename)
+	path := filepath.Join(targetDir, filename)
+
+    dstFile, err := os.Create(path)
     if err != nil {
         return err
     }
@@ -77,32 +76,12 @@ func generateAsepriteFile(filename string) error {
     return nil
 }
 
-func initGitRepo() error {
-    cmd := exec.Command("git", "init")
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    return cmd.Run()
-}
-
-func initialCommit() error {
-    cmd := exec.Command("git", "add", ".")
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    if err := cmd.Run(); err != nil {
-        return err
-    }
-
-    cmd = exec.Command("git", "commit", "-m", "Initial commit")
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    
-	return cmd.Run()
-}
-
 func openAsepriteFile(filename string) error {
     var cmd *exec.Cmd
 
-    cmd = exec.Command("cmd", "/c", "start", filename)
+	path := filepath.Join(targetDir, filename)
+
+    cmd = exec.Command("cmd", "/c", "start", path)
 
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr

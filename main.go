@@ -38,7 +38,7 @@ func main(){
 				os.Exit(1)
 			}
 
-			err = openAsepriteFile(args[0] + ".aseprite")
+			err = openFile(args[0] + ".aseprite")
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -56,7 +56,7 @@ func main(){
 				os.Exit(1)
 			}
 		
-			err = openMdFile(args[0] + ".md")
+			err = openFile(args[0] + ".md")
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -102,7 +102,7 @@ func generateAsepriteFile(filename string) error {
     return nil
 }
 
-func openAsepriteFile(filename string) error {
+func openFile(filename string) error {
     var cmd *exec.Cmd
 
 	path := filepath.Join(targetDir, filename)
@@ -130,19 +130,6 @@ func generateMdFile(filename string) error {
 
 	return nil
 }
-
-func openMdFile(filename string) error {
-	var cmd *exec.Cmd
-
-	path := filepath.Join(glyphDir, filename)
-
-	cmd = exec.Command("cmd", "/c", "start", path)
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
 
 func startViper(){
 	viper.AddConfigPath("C:\\rune\\configs")

@@ -7,18 +7,19 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/spf13/viper"
+
 	"github.com/spf13/cobra"
 )
 
 var (
-    outputFileName string
     targetDir      string
+	glyphDir       string
+	templateDir    string
 )
 
 
 func main(){
-	targetDir = ".code/wiki/res/aseprite"
-
 	var rootCmd = &cobra.Command{
 		Use: "rune",
 		Short: "Rune is a CLI application to generate .aseprite files",
@@ -45,7 +46,32 @@ func main(){
 		},
 	}
 
+	var glyph = &cobra.Command{
+		Use: "glyph",
+		Short: "glyph your rune!",
+		Run: func(cmd *cobra.Command, args []string){
+			err := generateMdFile(args[0] + ".md")
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		
+			err = openMdFile(args[0] + ".md")
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		},
+	}
+
 	rootCmd.AddCommand(power)
+	rootCmd.AddCommand(glyph)
+	startViper()
+	
+	//loading the config paramters
+	targetDir = viper.GetString("user.power_path")
+	glyphDir = viper.GetString("user.glyph_path")
+	templateDir = viper.GetString("user.template_path")
 
 	if err := rootCmd.Execute(); err != nil{
 		fmt.Println(err)
@@ -54,7 +80,7 @@ func main(){
 }
 
 func generateAsepriteFile(filename string) error {
-    srcFile, err := os.Open("C:\\rune\\template.aseprite")
+    srcFile, err := os.Open(templateDir)
     if err != nil {
         return err
     }
@@ -86,4 +112,45 @@ func openAsepriteFile(filename string) error {
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
     return cmd.Run()
+}
+
+func generateMdFile(filename string) error {
+	path := filepath.Join(glyphDir, filename)
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString("# Hello World")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func openMdFile(filename string) error {
+	var cmd *exec.Cmd
+
+	path := filepath.Join(glyphDir, filename)
+
+	cmd = exec.Command("cmd", "/c", "start", path)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+
+func startViper(){
+	viper.AddConfigPath("C:\\rune\\configs")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Println("Config file not found...")
+	}
 }

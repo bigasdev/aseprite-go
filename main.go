@@ -83,6 +83,18 @@ func main() {
 					fmt.Println(err)
 					os.Exit(1)
 				}
+			} else if args[1] == "prototype" {
+				err := generateCraftFile(craftDir, args[0]+".md", Prototype())
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if args[1] == "project" {
+				err := generateCraftFile(craftDir, args[0]+".md", Project())
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
 			} else {
 				fmt.Println("Invalid type")
 				os.Exit(1)

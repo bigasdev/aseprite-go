@@ -50,7 +50,7 @@ func main() {
 		Use:   "glyph",
 		Short: "glyph your rune!",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := generateMdFile(args[0] + ".md")
+			err := generateMdFile(glyphDir, args[0]+".md")
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -69,9 +69,19 @@ func main() {
 		Short: "craft your rune!",
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Crafting your rune...")
-			fmt.Println(args[0])
-			fmt.Println(args[1])
+			if args[1] == "video" {
+				err := generateCraftFile(craftDir, args[0]+".md", Video())
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			}
+
+			err := openFile(args[0] + ".md")
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		},
 	}
 
@@ -85,6 +95,7 @@ func main() {
 	//loading the config paramters
 	targetDir = viper.GetString("user.power_path")
 	glyphDir = viper.GetString("user.glyph_path")
+	craftDir = viper.GetString("user.craft_path")
 	templateDir = viper.GetString("user.template_path")
 
 	if err := rootCmd.Execute(); err != nil {
@@ -128,8 +139,8 @@ func openFile(filename string) error {
 	return cmd.Run()
 }
 
-func generateMdFile(filename string) error {
-	path := filepath.Join(glyphDir, filename)
+func generateMdFile(filename string, pathDir string) error {
+	path := filepath.Join(pathDir, filename)
 
 	file, err := os.Create(path)
 	if err != nil {
@@ -138,6 +149,23 @@ func generateMdFile(filename string) error {
 	defer file.Close()
 
 	_, err = file.WriteString("# Hello World")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generateCraftFile(pathDir string, filename string, template string) error {
+	path := filepath.Join(pathDir, filename)
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(template)
 	if err != nil {
 		return err
 	}

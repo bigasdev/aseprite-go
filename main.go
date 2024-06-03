@@ -16,6 +16,7 @@ var (
 	targetDir   string
 	glyphDir    string
 	craftDir    string
+	filePathDir string
 	templateDir string
 )
 
@@ -75,6 +76,17 @@ func main() {
 					fmt.Println(err)
 					os.Exit(1)
 				}
+
+			} else if args[1] == "article" {
+				err := generateCraftFile(craftDir, args[0]+".md", Article())
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else {
+				fmt.Println("Invalid type")
+				os.Exit(1)
+
 			}
 
 			err := openFile(args[0] + ".md")
@@ -113,6 +125,8 @@ func generateAsepriteFile(filename string) error {
 
 	path := filepath.Join(targetDir, filename)
 
+	filePathDir = targetDir
+
 	dstFile, err := os.Create(path)
 	if err != nil {
 		return err
@@ -130,7 +144,7 @@ func generateAsepriteFile(filename string) error {
 func openFile(filename string) error {
 	var cmd *exec.Cmd
 
-	path := filepath.Join(targetDir, filename)
+	path := filepath.Join(filePathDir, filename)
 
 	cmd = exec.Command("cmd", "/c", "start", path)
 
@@ -141,6 +155,8 @@ func openFile(filename string) error {
 
 func generateMdFile(filename string, pathDir string) error {
 	path := filepath.Join(pathDir, filename)
+
+	filePathDir = pathDir
 
 	file, err := os.Create(path)
 	if err != nil {
@@ -158,6 +174,8 @@ func generateMdFile(filename string, pathDir string) error {
 
 func generateCraftFile(pathDir string, filename string, template string) error {
 	path := filepath.Join(pathDir, filename)
+
+	filePathDir = pathDir
 
 	file, err := os.Create(path)
 	if err != nil {

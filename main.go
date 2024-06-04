@@ -109,9 +109,45 @@ func main() {
 		},
 	}
 
+	var extract = &cobra.Command{
+		Use:   "extract",
+		Short: "extract your rune!",
+		Run: func(cmd *cobra.Command, args []string) {
+			if args[0] == "video" {
+				err := openFolder(craftDir)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if args[0] == "article" {
+				err := openFolder(craftDir)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if args[0] == "prototype" {
+				err := openFolder(craftDir)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if args[0] == "project" {
+				err := openFolder(craftDir)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else {
+				fmt.Println("Invalid type")
+				os.Exit(1)
+			}
+		},
+	}
+
 	rootCmd.AddCommand(power)
 	rootCmd.AddCommand(glyph)
 	rootCmd.AddCommand(craft)
+	rootCmd.AddCommand(extract)
 	startViper()
 
 	Video()
@@ -159,6 +195,16 @@ func openFile(filename string) error {
 	path := filepath.Join(filePathDir, filename)
 
 	cmd = exec.Command("cmd", "/c", "start", path)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func openFolder(folderpath string) error {
+	var cmd *exec.Cmd
+
+	cmd = exec.Command("cmd", "/c", "explorer", folderpath)
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
